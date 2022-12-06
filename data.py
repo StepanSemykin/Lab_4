@@ -20,9 +20,31 @@ def data_frame(data_frame: pd.DataFrame, directory_obj: str, name: str):
     print(data_frame)
     return data_frame
     
+def dimension(data_frame: pd.DataFrame):
+    width_list = []
+    height_list = []
+    channels_list = []
     
+    for i in data_frame.path: 
+        img = cv2.imread(i)
+        width_list.append(img.shape[0])
+        height_list.append(img.shape[1])
+        channels_list.append(img.shape[2])
     
+    data_frame["width"] = pd.Series(width_list)
+    data_frame["height"] = pd.Series(height_list)
+    data_frame["channels"] = pd.Series(channels_list)
     
+    print(data_frame)
+    return data_frame
+        
+def stat(data_frame: pd.DataFrame):
+    print(data_frame.describe())    
+    if data_frame.tag.mean() == 0.5:
+        print("Набор является сбалансированным")
+    else: 
+        print("Набор не является сбалансированным")   
+        
 def main():
     """Separates code blocks."""
     df = pd.DataFrame()
@@ -30,7 +52,9 @@ def main():
     df = data_frame(df, "D:\Lab Python\Lab_1\dataset\ rose", "rose")
     df = data_frame(df, "D:\Lab Python\Lab_1\dataset\ tulip", "tulip")
     
-    
+    df = dimension(df)
+
+    stat(df)
     
 if __name__ == "__main__":
 	main()  
