@@ -1,6 +1,8 @@
 import pandas as pd
 import os 
 import cv2
+import numpy as np
+from statistics import mean
 
 def data_frame(data_frame: pd.DataFrame, directory_obj: str, name: str):
     data = os.listdir(directory_obj)
@@ -51,13 +53,33 @@ def filter_tag(data_frame: pd.DataFrame, class_tag: int):
     print(data_frame2)    
     return data_frame2
 
-
 def filter_dimensions(data_frame: pd.DataFrame, class_tag: int, max_height: int, max_width: int): 
     data_frame2 = pd.DataFrame()
     data_frame2 = data_frame[(data_frame.tag == class_tag) & (data_frame.width <= max_width) & (data_frame.height <= max_height)]
     print(data_frame2)
     return data_frame2
-            
+
+def pixel(data_frame: pd.DataFrame, class_tag: int):
+    data_frame2 = pd.DataFrame()
+    data_frame2 = data_frame[data_frame.tag == class_tag]
+    
+    sum_list = []
+    sum = 0
+    
+    for i in data_frame2.path:
+        img = cv2.imread(i)
+        sum += np.sum(img == [255, 255, 255])
+        sum_list.append(sum)
+    
+    print(sum_list)
+    print(len(sum_list))
+    
+    data_frame2["min"] = pd.Series(min(sum_list))
+    data_frame2["max"] = pd.Series(max(sum_list))
+    data_frame2["average"] = pd.Series(mean(sum_list)) 
+    print(data_frame2)
+    return data_frame2
+          
 def main():
     """Separates code blocks."""
     df = pd.DataFrame()
@@ -74,6 +96,9 @@ def main():
     
     df3 = pd.DataFrame()
     df3 = filter_dimensions(df, 0, 300, 460)
+    
+    df4 = pd.DataFrame() 
+    df4 = pixel(df, 0)
  
 if __name__ == "__main__":
 	main()  
