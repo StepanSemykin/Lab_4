@@ -6,7 +6,15 @@ from statistics import mean
 import matplotlib.pyplot as plt
 import random
 
-def data_frame(data_frame: pd.DataFrame, directory_obj: str, name: str):
+def data_frame(data_frame: pd.DataFrame, directory_obj: str, name: str) -> pd.DataFrame:
+    """Сreates a dataframe specifying the path and class label.
+    Args:
+        data_frame (pd.DataFrame): the original dataframe.
+        directory_obj (str): the path of the source folder.
+        name (str): object class.
+    Returns:
+        pd.DataFrame: dataframe with class paths and labels.
+    """    
     data = os.listdir(directory_obj)
     
     if data_frame.empty:
@@ -24,7 +32,13 @@ def data_frame(data_frame: pd.DataFrame, directory_obj: str, name: str):
     print(data_frame)
     return data_frame
     
-def dimension(data_frame: pd.DataFrame):
+def dimension(data_frame: pd.DataFrame) -> pd.DataFrame:
+    """Adds the width height and depth of the image to the dataframe.
+    Args:
+        data_frame (pd.DataFrame): the original dataframe.
+    Returns:
+        pd.DataFrame: dataframe with width height and depth of images.
+    """    
     width_list = []
     height_list = []
     channels_list = []
@@ -42,26 +56,53 @@ def dimension(data_frame: pd.DataFrame):
     print(data_frame)
     return data_frame
         
-def stat(data_frame: pd.DataFrame):
+def stat(data_frame: pd.DataFrame) -> None:
+    """Displays statistics on the dataframe.
+    Args:
+        data_frame (pd.DataFrame): the original dataframe.
+    """    
     print(data_frame.describe())    
     if data_frame.tag.mean() == 0.5:
         print("Набор является сбалансированным\n")
     else: 
         print("Набор не является сбалансированным\n")   
  
-def filter_tag(data_frame: pd.DataFrame, class_tag: int):
+def filter_tag(data_frame: pd.DataFrame, class_tag: int) -> pd.DataFrame:
+    """Creates a dataframe based on a numeric class label.
+    Args:
+        data_frame (pd.DataFrame): the original dataframe.
+        class_tag (int): numeric class label.
+    Returns:
+        pd.DataFrame: dataframe with a specific numeric class label.
+    """      
     data_frame2 = pd.DataFrame()
     data_frame2 = data_frame[data_frame.tag == class_tag]
     print(data_frame2)    
     return data_frame2
 
-def filter_dimensions(data_frame: pd.DataFrame, class_tag: int, max_height: int, max_width: int): 
+def filter_dimensions(data_frame: pd.DataFrame, class_tag: int, max_height: int, max_width: int) -> pd.DataFrame:
+    """Filters the dataframe by the width and height of the image
+    Args:
+        data_frame (pd.DataFrame): the original dataframe.
+        class_tag (int): numeric class label.
+        max_height (int): height border.
+        max_width (int): width border.
+    Returns:
+        pd.DataFrame: dataframe with the width and height of images in the range.
+    """    
     data_frame2 = pd.DataFrame()
     data_frame2 = data_frame[(data_frame.tag == class_tag) & (data_frame.width <= max_width) & (data_frame.height <= max_height)]
     print(data_frame2)
     return data_frame2
 
-def pixel(data_frame: pd.DataFrame, class_tag: int):
+def pixel(data_frame: pd.DataFrame, class_tag: int) -> pd.DataFrame:
+    """Сalculates the maximum, minimum, average pixel values for all images.
+    Args:
+        data_frame (pd.DataFrame): the original dataframe.
+        class_tag (int): numeric class label.
+    Returns:
+        pd.DataFrame: dataframe with maximum minimum and average pixel values across all images.
+    """    
     data_frame2 = pd.DataFrame()
     data_frame2 = data_frame[data_frame.tag == class_tag]
     
@@ -82,7 +123,14 @@ def pixel(data_frame: pd.DataFrame, class_tag: int):
     print(data_frame2)
     return data_frame2
 
-def hist(data_frame: pd.DataFrame, class_tag: int):
+def hist(data_frame: pd.DataFrame, class_tag: int) -> np.ndarray:
+    """Сalculates a histogram for RGB.
+    Args:
+        data_frame (pd.DataFrame): the original dataframe.
+        class_tag (int): numeric class label.
+    Returns:
+        np.ndarray: histograms by RGB colors.
+    """    
     data_frame = data_frame[data_frame.tag == class_tag]
     
     path_list = []
@@ -95,12 +143,18 @@ def hist(data_frame: pd.DataFrame, class_tag: int):
     img = cv2.imread(path_list[0])
     print(path_list[0])
     hist_b = cv2.calcHist([img], [0], None, [256], [0, 256])
-    hist_g = cv2.calcHist([img],[1],None,[256],[0,256])
-    hist_r = cv2.calcHist([img],[2],None,[256],[0,256])
+    hist_g = cv2.calcHist([img], [1], None, [256], [0, 256])
+    hist_r = cv2.calcHist([img], [2], None, [256], [0, 256])
     return hist_b, hist_g, hist_r
 
-def output_hist(hist_b: np.ndarray, hist_g: np.ndarray, hist_r: np.ndarray):
-    fig = plt.figure(figsize=(30, 8))
+def output_hist(hist_b: np.ndarray, hist_g: np.ndarray, hist_r: np.ndarray) -> None:
+    """Displays histograms.
+    Args:
+        hist_b (np.ndarray): blue histogram.
+        hist_g (np.ndarray): green histogram.
+        hist_r (np.ndarray): red histogram.
+    """    
+    fig = plt.figure(figsize = (30, 8))
     
     fig.add_subplot(1, 3, 1)
     plt.plot(hist_b, color = "b")
@@ -131,23 +185,20 @@ def main():
     
     df = dimension(df)
 
-    # stat(df)
+    stat(df)
     
-    # df2 = pd.DataFrame()
-    # df2 = filter_tag(df, 5)
+    df2 = pd.DataFrame()
+    df2 = filter_tag(df, 5)
     
-    # df3 = pd.DataFrame()
-    # df3 = filter_dimensions(df, 0, 300, 460)
+    df3 = pd.DataFrame()
+    df3 = filter_dimensions(df, 0, 300, 460)
     
-    # df4 = pd.DataFrame() 
-    # df4 = pixel(df, 0)
+    df4 = pd.DataFrame() 
+    df4 = pixel(df, 0)
     
     b, g, r = hist(df, 0)
-    print(type(b))
     output_hist(b, g, r)
     
-    
- 
 if __name__ == "__main__":
 	main()  
  
