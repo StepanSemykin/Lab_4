@@ -28,8 +28,7 @@ def data_frame(data_frame: pd.DataFrame, directory_obj: str, name: str) -> pd.Da
         path = f"{directory_obj}\{i}"
         data_frame2 = pd.DataFrame({"Class": name, "path": [path], "tag": count})
         data_frame = pd.concat([data_frame, data_frame2], ignore_index = True)
-    
-    print(data_frame)
+
     return data_frame
     
 def dimension(data_frame: pd.DataFrame) -> pd.DataFrame:
@@ -95,6 +94,8 @@ def filter_dimensions(data_frame: pd.DataFrame, class_tag: int, max_height: int,
     print(data_frame2)
     return data_frame2
 
+pd.options.mode.chained_assignment = None
+
 def pixel(data_frame: pd.DataFrame, class_tag: int) -> pd.DataFrame:
     """Сalculates the maximum, minimum, average pixel values for all images.
     Args:
@@ -111,15 +112,16 @@ def pixel(data_frame: pd.DataFrame, class_tag: int) -> pd.DataFrame:
     
     for i in data_frame2.path:
         img = cv2.imread(i)
-        sum += np.sum(img == [255, 255, 255])
+        sum += np.sum(img == 255)
         sum_list.append(sum)
     
-    print(sum_list)
-    print(len(sum_list))
-    
-    data_frame2["min"] = pd.Series(min(sum_list))
-    data_frame2["max"] = pd.Series(max(sum_list))
-    data_frame2["average"] = pd.Series(mean(sum_list)) 
+    # data_frame2["min"] = pd.Series(min(sum_list))
+    # data_frame2["max"] = pd.Series()
+    # data_frame2["average"] = pd.Series(mean(sum_list)) 
+
+    data_frame2.loc[:, "min"] = min(sum_list)
+    data_frame2.loc[:, "max"] = max(sum_list)
+    data_frame2.loc[:, "average"] = np.average(sum_list)
     print(data_frame2)
     return data_frame2
 
@@ -182,6 +184,7 @@ def main():
     
     df = data_frame(df, "D:\Lab Python\Lab_1\dataset\ rose", "rose")
     df = data_frame(df, "D:\Lab Python\Lab_1\dataset\ tulip", "tulip")
+    print(df)
     
     df = dimension(df)
 
